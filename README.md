@@ -311,6 +311,11 @@ A read-only server-side Ed25519 deploy key (`github-deploy`) pulls repository up
 
 ### Update workflow
 
+The routine path is the Deploy workflow: GitHub repo → Actions → Deploy → Run workflow, which pulls the latest `main` on the host, rebuilds the image, and restarts the services.
+It needs the self-hosted runner registered to this repository with the `wsl-vps` label to be online.
+The workflow triggers only on manual dispatch, never on merge.
+Manual fallback from a workstation:
+
 ```bash
 ssh support-vps
 cd ~/ai-customer-support
@@ -332,7 +337,7 @@ This is a portfolio project, not a production SaaS.
 - One mailbox and one tenant. Multi-tenant work needs per-tenant OAuth and knowledge-base isolation.
 - The poller is a loop, not a queue. A job queue would handle bursts and retries better.
 - Dashboard auth is HTTP Basic. Put it behind TLS before exposing it beyond localhost.
-- There is no CI yet. The next step is a workflow that runs lint, typecheck, and a small eval subset on every pull request.
+- CI runs on every PR (Docker build, dashboard typecheck and lint, image build). Deployment is manual dispatch by design, never automatic on merge.
 - The latest saved eval run predates the escaped-newline fix. Re-run the suite to confirm the fix on the full set.
 
 ## License
