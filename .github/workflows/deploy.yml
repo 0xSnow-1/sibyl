@@ -1,0 +1,22 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy to WSL2 host
+    runs-on: [self-hosted, wsl-vps]
+    steps:
+      - name: Pull latest main
+        run: |
+          git -C "$HOME/ai-customer-support" fetch origin main
+          git -C "$HOME/ai-customer-support" checkout main
+          git -C "$HOME/ai-customer-support" pull --ff-only origin main
+      - name: Rebuild and restart
+        run: cd "$HOME/ai-customer-support" && docker compose up -d --build
+      - name: Wait for the API
+        run: bash -c 'for i in $(seq 1 30); do code=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8080/api/health); if [ "$code" = "200" ] || [ "$code" = "401" ]; then echo "API responding ($code)"; exit 0; fi; sleep 5; done; echo "API did not respond in time"; exit 1'
