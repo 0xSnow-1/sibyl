@@ -292,6 +292,25 @@ Dockerfile            dashboard build plus Python runtime
 docker-compose.yml    API and poller services
 ```
 
+## CI/CD
+
+Continuous integration runs on every push and pull request to `main` (`.github/workflows/main.yaml`).
+
+- Docker build, which proves `pyproject.toml` and `uv.lock` agree and that the dashboard compiles inside the image.
+- Dashboard: `npm ci`, `typecheck`, `lint`, and `vite build`.
+- Compose config validation with an empty placeholder `.env`.
+
+There is no test suite yet, so the pipeline asserts the build and lints only. The evals stay manual because they call paid models with live keys.
+
+Deployment is manual dispatch by design (`.github/workflows/deploy.yml`).
+
+- `Actions → Deploy → Run workflow` pulls the latest `main` on the host, rebuilds the image, restarts the services, and waits for `/api/health` to respond.
+- The job runs on a self-hosted runner registered to this repo with the `wsl-vps` label, living next to the containers it ships.
+- The workflow has no push or pull request trigger, so nothing deploys on merge.
+- Forks cannot trigger it either: the workflow only fires on manual dispatch, and fork pull request workflows require approval from an external contributor.
+
+No checks block the Merge button on this repository. The green state is advisory only.
+
 ## Deployment
 
 The stack is designed for one small host.
