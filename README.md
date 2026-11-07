@@ -40,11 +40,26 @@ Python decides what happens next.
 ## Highlights
 
 - Two-model pipeline. A small classifier routes the email, then a larger model writes the reply with tool access to the knowledge base.
+- Typed outputs end to end. The classifier returns a typed `Classification`, the agent returns an `AgentReply`, and malformed JSON is rejected before anything reaches Gmail.
+- Claim-then-process with a unique constraint on every Gmail message; a duplicate poll can never send twice.
 - Deterministic rules decide replacements, exchanges, and escalations. The model cannot promise a refund, a shipment, or a delivery date.
 - Output validators reject a truncated reply, a missing sign-off, or a reply that mentions AI.
 - An 18-case golden set with four checks per case. The suite caught a release that scored 100% while sending cut-off emails.
 - A React admin dashboard, a FastAPI API, and a Docker image that runs the API and the Gmail poller.
 - An isolated Ubuntu WSL2 sandbox serves the stack behind SSH-only access and a read-only deploy key.
+
+## Model choices
+
+Routing is a latency-sensitive, near-deterministic task: one model classifies every inbound email into a section.
+The classifier runs on `cerebras:qwen-3.8-27b`, a small open model served by Cerebras at very high throughput.
+
+The reply is the only step a customer reads, and it also produces the structured issue object that the deterministic rules act on.
+That step runs on `nvidia:nvidia/nemotron-3-ultra-550b-a55b`, a much larger reasoning model.
+JSON validity and answer quality matter more than latency for this step.
+
+Both endpoints are OpenAI-compatible.
+`app/ai/models.py` maps the `provider:model` strings to endpoints, so either model is a config change, not a code change.
+An Anthropic path is installed as the fallback for the truncation case.
 
 ## Evaluations
 
