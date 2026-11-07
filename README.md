@@ -46,6 +46,46 @@ Python decides what happens next.
 - A React admin dashboard, a FastAPI API, and a Docker image that runs the API and the Gmail poller.
 - An isolated Ubuntu WSL2 sandbox serves the stack behind SSH-only access and a read-only deploy key.
 
+## Demo
+
+Sixty seconds of the thing working: an easy question, a risky one, and the console that records both.
+
+<p align="center">
+  <img src="docs/demo/01-send.gif" width="240" alt="Sending a board-sizing email to the support inbox">
+  <img src="docs/demo/02-received.gif" width="240" alt="Inbox with the new unread message">
+  <img src="docs/demo/03-label.gif" width="240" alt="Gmail thread with the processed label applied">
+</p>
+
+**The auto-reply path.**
+A routine question lands in Gmail, the poller picks it up, the agent answers from the knowledge base, and the thread closes out with the processed label.
+No human involved.
+
+<p align="center">
+  <img src="docs/demo/04-hitl-message.gif" width="360" alt="A refund request arriving in the inbox">
+  <img src="docs/demo/05-hitl-ack.gif" width="360" alt="The thread labeled needs-human after the acknowledgement">
+</p>
+
+**Human in the loop.**
+A refund request is never promised anything.
+The customer gets a short acknowledgement, the thread lands in `needs-human`, and a teammate owns it from there.
+
+<p align="center">
+  <img src="docs/demo/06-events-poll.gif" width="300" alt="Events tab with the Check inbox now button">
+  <img src="docs/demo/07-tickets.gif" width="300" alt="Tickets view pairing each poll message with its reply">
+  <img src="docs/demo/08-thread.gif" width="300" alt="Thread view with the customer question and the AI reply">
+  <img src="docs/demo/09-dashboard.gif" width="300" alt="Harbor and Pine support dashboard login and tour">
+</p>
+
+**The operator console.**
+One click drains the mailbox, every event is recorded, tickets come paired with their replies, and the full thread history is a click away.
+
+<p align="center">
+  <img src="docs/demo/10-kb.gif" width="560" alt="Knowledge base editor showing the Paddle boards section">
+</p>
+
+**The knowledge base is the product.**
+Support facts edit live, and the agent reads the new text on the next poll.
+
 ## Evaluations
 
 The golden set has 18 customer emails shaped like real inbox traffic.
